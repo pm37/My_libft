@@ -6,30 +6,30 @@
 #    By: bwan-nan <bwan-nan@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/03/01 16:03:53 by bwan-nan          #+#    #+#              #
-#    Updated: 2019/04/10 17:49:56 by pimichau         ###   ########.fr        #
+#    Updated: 2019/05/13 13:02:28 by pimichau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = libftprintf.a
-LIB = $(LPATH)libft.a
-LIBDB = $(LPATH)libftdb.a
 
 SPATH = src/
 IPATH = inc/
+OPATH = obj/
 
 CLEANUP = /bin/rm -rf
 
-CC = Clang
+CC = gcc
 COMPILE = $(CC) -c
-
-vpath %.c src/
-vpath %.h inc/
+MKDIR = mkdir -p
 
 WFLAGS += -Wall
 WFLAGS += -Werror
 WFLAGS += -Wextra
 IFLAGS = -I $(IPATH)
 CFLAGS = $(WFLAGS) $(IFLAGS)
+
+INC += ft_printf.h
+INC += updated_libft.h
 
 SRCS += ft_printf.c
 SRCS += init_struct.c
@@ -133,23 +133,29 @@ SRCS += ft_putstr_fd.c
 SRCS += ft_recursive_power.c
 SRCS += ft_max.c
 
-OBJS = $(patsubst %.c, ./%.o, $(SRCS))
+vpath %.c src/
+vpath %.h inc/
 
-all : $(NAME)
+OBJS = $(patsubst %.c, $(OPATH)%.o, $(SRCS))
+
+all: $(OPATH) $(NAME)
 
 $(NAME): $(OBJS) 
-		ar -rus $@ $^
+	ar -crus $@ $^
+	printf "Libft ready.\n"
 
-$(OBJS) : ./%.o : $(SPATH)%.c $(SRCS) 
-		$(COMPILE) $(CFLAGS) $< -o $@
+$(OBJS): $(OPATH)%.o : %.c $(INC) 
+	$(COMPILE) $(CFLAGS) $< -o $@
 
-clean :
-		$(CLEANUP) $(OBJS)
+$(OPATH):
+	$(MKDIR) $@
 
-fclean : clean
-		$(CLEANUP) $(NAME)
+clean:
+	$(CLEANUP) $(OPATH)
+
+fclean: clean
+	$(CLEANUP) $(NAME)
 
 re: fclean all
 
 .PHONY: all clean fclean re
-
